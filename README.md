@@ -9,6 +9,8 @@ Plataforma web desarrollada para la **Universidad Tecnológica de Mineral de la 
 
 creador por:
 Doge8458 (Mario Alberto)
+
+
 Saul Rocha
 
 ---
