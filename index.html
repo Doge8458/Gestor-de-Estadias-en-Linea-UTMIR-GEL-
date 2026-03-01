@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagina Principal</title>
+</head>
+<body>
+    
+    <header>
+        <h1>Bienvenido a la Pagina Principal</h1>
+        <hr>
+    </header>
+</body>
+
+<main>
+    <h2>Iniciar sesión</h2>
+    <p>Porfavor, Ingresa tus credenciales para continuar</p>
+
+    <form action="api/login.php" method="POST">
+        <label for="matricula">Usuario (Matrícula):</label>
+        <input type="text" id="matricula" name="matricula" required>
+        <br><br>
+        
+        <label for="curp">Contraseña (CURP):</label>
+        <input type="password" id="curp" name="curp" required>
+        <br><br>
+        
+        <input type="submit" value="Iniciar Sesión">
+    </form> 
+</main>
+
+<footer>
+    <hr>
+    <p>&copy; 2025 - Universidad Tecnologíca de Mineral de la Reforma.</p>
+</footer>
+
+</html>

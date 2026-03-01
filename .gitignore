@@ -1,0 +1,20 @@
+# ==========================================
+# GESTOR DE ESTADÍAS EN LÍNEA (GEL) - UTMIR
+# Archivos ignorados por seguridad
+# ==========================================
+
+# Credenciales de Google (¡NUNCA SUBIR!)
+client_secret.json
+api/token.json
+credentials.json
+
+# Dependencias (Son muy pesadas, se instalan con composer)
+vendor/
+
+# Archivos subidos por los alumnos
+uploads/
+uploads/temp/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
