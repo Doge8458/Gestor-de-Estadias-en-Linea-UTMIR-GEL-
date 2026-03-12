@@ -56,20 +56,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['nombre'] = $nombre_completo_db;
 
             // 13. Redirigimos al dashboard (¡RUTA CORREGIDA!)
-            header("Location: /ProyectoUSB/dashboard.php");
+            header("Location: ../dashboard.php");
             exit(); 
 
         } else {
             // Error: Contraseña incorrecta
             // Redirigimos al index (¡RUTA CORREGIDA!)
-            header("Location: /ProyectoUSB/index.html?error=1");
+            header("Location: ../index.html?error=1");
             exit();
         }
 
     } else {
         // Error: Matrícula no encontrada
         // Redirigimos al index (¡RUTA CORREGIDA!)
-        header("Location: /ProyectoUSB/index.html?error=1");
+        header("Location: ../index.html?error=1");
         exit();
     }
 
