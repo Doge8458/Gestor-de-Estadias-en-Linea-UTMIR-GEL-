@@ -3,38 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagina Principal</title>
-</head>
-
-<body>
-    
-    <header>
-        <h1>Bienvenido a la Pagina Principal USUARIO</h1>
-        <hr>
-    </header>
-</body>
-
-<main>
+    <title>GEL - Gestor de Estadías en Línea</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/styles.css">
-    <h2>Iniciar sesión</h2>
-    <p>Porfavor, Ingresa tus credenciales para continuar</p>
+</head>
+<body>
 
-    <form action="api/login.php" method="POST">
-        <label for="matricula">Usuario (Matrícula):</label>
-        <input type="text" id="matricula" name="matricula" required>
-        <br><br>
+    <div class="container" id="container">
         
-        <label for="curp">Contraseña (CURP):</label>
-        <input type="password" id="curp" name="curp" required>
-        <br><br>
+        <div class="form-container sign-up-container">
+            <form action="api/login.php" method="POST">
+                <div class="gel-logo">GEL</div>
+                <div class="gel-subtitle">GESTOR DE ESTADÍAS EN LÍNEA</div>
+                
+                <h2 style="color: #333; margin-top:10px;">Bienvenido Universitario</h2>
+                <span>Ingresa con tu Matrícula y CURP para acceder a la plataforma de memorias.</span>
+                
+                <input type="text" name="matricula" placeholder="Usuario (Matrícula) Ej. 2403188" required />
+                <input type="password" name="curp" placeholder="Contraseña (CURP)" required />
+                
+                <button type="submit">Iniciar Sesión</button>
+            </form>
+        </div>
+
+        <div class="form-container sign-in-container">
+            <form action="#">
+                </form>
+        </div>
+
+        <div class="overlay-container">
+            <div class="overlay">
+                
+                <div class="overlay-panel overlay-left">
+                    <h1>¡Tu Mejor Opción Para ser Universitario!</h1>
+                    <p>Ingresa tu matrícula y CURP para acceder a tu panel de estadías y continuar con tu proceso.</p>
+                    <button class="ghost" id="signIn">Regresar</button>
+                </div>
+                
+                <div class="overlay-panel overlay-right">
+                    <h1>GEL UTMIR</h1>
+                    <p>Bienvenido al Gestor de Estadías en Línea. Accede al portal para entregar tu memoria final.</p>
+                    <button class="ghost" id="signUp">Subir Memoria</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        © 2026 - Universidad Tecnológica de Mineral de la Reforma.
+        <div class="lema">PROYECTA • INNOVA • ALCANZA</div>
+    </footer>
+
+    <script>
+        const signUpButton = document.getElementById('signUp');
+        const signInButton = document.getElementById('signIn');
+        const container = document.getElementById('container');
         
-        <input type="submit" value="Iniciar Sesión">
-    </form> 
-</main>|
+        // Seleccionamos el lema del footer
+        const lemaFooter = document.querySelector('.lema');
 
-<footer>
-    <hr>
-    <p>&copy; 2025 - Universidad Tecnologíca de Mineral de la Reforma.</p>
-</footer>
+        // Al hacer clic en "Subir Memoria" (Se abre el Login)
+        signUpButton.addEventListener('click', () => {
+            container.classList.add('right-panel-active');
+            // Cambiamos el color del lema a Guinda
+            lemaFooter.classList.add('guinda');
+        });
 
+        // Al hacer clic en "Regresar" (Vuelve a la vista inicial)
+        signInButton.addEventListener('click', () => {
+            container.classList.remove('right-panel-active');
+            // Devolvemos el color del lema a Verde
+            lemaFooter.classList.remove('guinda');
+        });
+    </script>
+
+</body>
 </html>
