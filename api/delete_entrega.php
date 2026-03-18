@@ -65,11 +65,9 @@ $stmtDelete = $conexion->prepare("DELETE FROM entregas WHERE id_entrega = ?");
 $stmtDelete->bind_param("i", $id_entrega);
 
 if ($stmtDelete->execute()) {
-    // Éxito: Regresar al panel
-    echo "<script>
-            alert('Registro y archivo eliminados correctamente.');
-            window.location.href = '../admin/panel.php';
-          </script>";
+    // Éxito: Regresar al panel y activar el modal CSS a través de la URL
+    header("Location: ../admin/panel.php?deleted=true");
+    exit();
 } else {
     echo "Error al eliminar de BD: " . $conexion->error;
 }
