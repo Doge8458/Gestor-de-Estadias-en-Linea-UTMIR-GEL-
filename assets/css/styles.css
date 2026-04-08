@@ -1,9 +1,9 @@
 :root {
-    /* Variables de colores institucionales */
-    --utmir-verde: #006b3f; /* Verde solicitado */
-    --utmir-guinda: #801336; 
+    /* Variables de colores institucionales UTMIR */
+    --utmir-verde: #1A633E; /* Nuevo verde principal */
+    --utmir-naranja: #E74D23; /* Naranja de acento (Reemplaza al guinda) */
     --blanco: #ffffff;
-    --gris-fondo: #f6f5f7;
+    --gris-fondo: #F0F9F3; /* Verde muy claro para el fondo */
     --gris-texto: #333333;
 }
 
@@ -25,7 +25,7 @@ body {
 }
 
 h1 { font-weight: bold; margin: 0; color: var(--blanco); }
-h2 { color: var(--utmir-guinda); margin-bottom: 5px; }
+h2 { color: var(--utmir-verde); margin-bottom: 5px; } /* Ajustado a verde para limpieza institucional */
 
 p {
     font-size: 14px;
@@ -40,8 +40,8 @@ span { font-size: 12px; color: #666; margin-bottom: 20px;}
 /* Estilos de Botones */
 button {
     border-radius: 5px;
-    border: 1px solid var(--utmir-guinda);
-    background-color: var(--utmir-guinda);
+    border: 1px solid var(--utmir-naranja);
+    background-color: var(--utmir-naranja);
     color: var(--blanco);
     font-size: 12px;
     font-weight: bold;
@@ -157,11 +157,11 @@ input {
     transform: translateX(-100%);
 }
 
-/* Fondo del Overlay (Verde y Guinda) */
+/* Fondo del Overlay (Verde y Naranja) */
 .overlay {
     background: var(--utmir-verde);
-    background: -webkit-linear-gradient(to right, var(--utmir-verde), var(--utmir-guinda));
-    background: linear-gradient(to right, var(--utmir-verde), var(--utmir-guinda));
+    background: -webkit-linear-gradient(to right, var(--utmir-verde), var(--utmir-naranja));
+    background: linear-gradient(to right, var(--utmir-verde), var(--utmir-naranja));
     background-repeat: no-repeat;
     background-size: cover;
     background-position: 0 0;
@@ -237,14 +237,6 @@ footer {
     color: #666;
 }
 
-footer .lema {
-    color: var(--utmir-verde); /* Lema coloreado en verde institucional */
-    font-weight: bold;
-    letter-spacing: 2px;
-    margin-top: 8px;
-    font-size: 14px;
-}
-
 /* Busca tu regla actual de footer .lema y asegúrate de agregarle la transición */
 footer .lema {
     color: var(--utmir-verde); /* Color por defecto (Vista Inicial) */
@@ -255,17 +247,15 @@ footer .lema {
     transition: color 0.6s ease-in-out; /* Esta línea hace que el cambio de color sea suave */
 }
 
-/* Agrega esta nueva clase justo debajo */
-footer .lema.guinda {
-    color: var(--utmir-guinda); /* Color cuando el formulario de Login está activo */
+/* Agrega esta nueva clase justo debajo (Reemplazando a .guinda) */
+footer .lema.naranja {
+    color: var(--utmir-naranja); /* Color cuando el formulario de Login está activo */
 }
 
-
-
-/*apartado plataforma administrativa, el lema del footer cambia a guinda cuando el
-formulario de login está activo. Para esto, se agrega la clase "guinda" al elemento del lema en el footer cuando el formulario de login está activo, y se define un estilo 
-para esa clase que cambia el color del texto a guinda. La transición suave se logra con 
-la propiedad "transition" en la regla CSS del lema.*/
+/* apartado plataforma administrativa, el lema del footer cambia a naranja cuando el
+formulario de login está activo. Para esto, se agrega la clase "naranja" al elemento del lema en el footer cuando el formulario de login está activo, y se define un estilo 
+para esa clase que cambia el color del texto a naranja. La transición suave se logra con 
+la propiedad "transition" en la regla CSS del lema. */
 
 /* =========================================
    ESTILOS DEL DASHBOARD Y TABLA (ADMIN)
@@ -347,9 +337,9 @@ la propiedad "transition" en la regla CSS del lema.*/
 
 .styled-table tbody tr:hover {
     background-color: #f4fbf7; /* Fondo verde súper clarito al pasar el mouse */
-    transform: translateY(-3px); /* Efecto de levitación */
-    box-shadow: 0 6px 15px rgba(0,0,0,0.08); /* Sombra al flotar */
-    border-left: 4px solid var(--utmir-guinda); /* Aparece la línea guinda a la izquierda */
+    transform: translateY(-3px); /* Efecto de levitación intacto */
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08); /* Sombra al flotar intacta */
+    border-left: 4px solid var(--utmir-naranja); /* Ahora aparece la línea naranja a la izquierda */
     border-radius: 5px;
 }
 
@@ -367,14 +357,14 @@ la propiedad "transition" en la regla CSS del lema.*/
     border-radius: 20px;
     font-size: 12px;
     font-weight: bold;
-    border: 1px solid rgba(0, 107, 63, 0.2);
+    border: 1px solid rgba(26, 99, 62, 0.2); /* Sombra RGBA actualizada al nuevo verde (#1A633E) */
 }
 
 /* --- BOTÓN DE ACCIÓN (ELIMINAR) --- */
 .btn-action {
     background-color: transparent;
-    border: 1px solid var(--utmir-guinda);
-    color: var(--utmir-guinda);
+    border: 1px solid var(--utmir-naranja);
+    color: var(--utmir-naranja);
     padding: 8px 16px;
     border-radius: 20px;
     cursor: pointer;
@@ -387,8 +377,8 @@ la propiedad "transition" en la regla CSS del lema.*/
 
 /* Animación del botón eliminar */
 .btn-action:hover {
-    background-color: var(--utmir-guinda);
+    background-color: var(--utmir-naranja);
     color: var(--blanco);
-    box-shadow: 0 4px 12px rgba(128, 19, 54, 0.4);
-    transform: scale(1.05); /* El botón crece ligeramente */
+    box-shadow: 0 4px 12px rgba(231, 77, 35, 0.4); /* Sombra RGBA actualizada al nuevo naranja (#E74D23) */
+    transform: scale(1.05); /* El botón crece ligeramente intacto */
 }

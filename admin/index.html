@@ -14,8 +14,8 @@
         
         <div class="form-container sign-up-container">
             <form action="../admin/login_auth.php" method="POST">
-                <div class="gel-logo" style="color: var(--utmir-guinda);">GEL</div>
-                <div class="gel-subtitle" style="color: var(--utmir-guinda);">PANEL DE CONTROL</div>
+                <div class="gel-logo" style="color: var(--utmir-verde);">GEL</div>
+                <div class="gel-subtitle" style="color: var(--utmir-verde);">PANEL DE CONTROL</div>
                 
                 <h2 style="color: #333; margin-top:10px;">Bienvenido Administrador</h2>
                 <span>Ingresa tus credenciales administrativas para continuar.</span>
@@ -43,7 +43,7 @@
                 
                 <div class="overlay-panel overlay-right">
                     <h1>GEL</h1>
-                    <h1>ADMNISTRACIÓN</h1> 
+                    <h1>ADMINISTRACIÓN</h1> 
                     <p>Bienvenido al Panel de Control.
                     Desde aquí podrás gestionar los procesos de los universitarios.</p>
                     <button class="ghost" id="signUp">Iniciar Sesión</button>
@@ -54,7 +54,7 @@
     </div>
 
     <footer>
-        <div class="lema">PROYECTA • INNOVA • ALCANZA</div> <br></br>
+        <div class="lema">PROYECTA • INNOVA • ALCANZA</div> <br>
         © <span id="currentYear"></span>. Universidad Tecnológica de Mineral de la Reforma. Todos los derechos reservados.
     </footer>
 
@@ -67,13 +67,15 @@
         // Al hacer clic en "Iniciar Sesión"
         signUpButton.addEventListener('click', () => {
             container.classList.add('right-panel-active');
-            lemaFooter.classList.add('guinda');
+            // Se actualiza la clase a naranja
+            lemaFooter.classList.add('naranja');
         });
 
         // Al hacer clic en "Regresar"
         signInButton.addEventListener('click', () => {
             container.classList.remove('right-panel-active');
-            lemaFooter.classList.remove('guinda');
+            // Se actualiza la clase a naranja
+            lemaFooter.classList.remove('naranja');
         });
 
         // Obtener el año dinámicamente
