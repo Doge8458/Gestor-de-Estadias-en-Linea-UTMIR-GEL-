@@ -1,138 +1,154 @@
 <?php
-// Ocultar avisos "Deprecated" y otros errores para no ensuciar la respuesta JSON
-ini_set('display_errors', 0);
+session_start();
+// Apagamos errores HTML para no romper la respuesta JSON a JavaScript
 error_reporting(0);
+header('Content-Type: application/json; charset=utf-8');
 
-// La respuesta será JSON
-header('Content-Type: application/json');
+require '../vendor/autoload.php';
 
-try {
-    // 1. CARGAR LA LIBRERÍA DE GOOGLE
-    require_once __DIR__ . '/../vendor/autoload.php';
+if (!isset($_SESSION['matricula'])) {
+    echo json_encode(['status' => 'error', 'message' => 'Sesión expirada.']);
+    exit;
+}
 
-    session_start();
-
-    // --- ID DE LA CARPETA RAÍZ ---
-    define('GOOGLE_DRIVE_ROOT_ID', '1ZqKmNp8XkEVsEXbQQouosIjBBv-Sar5d');
-
-    // 2. CONEXIÓN A BD
-    $servidor = "localhost"; $usuario_db = "root"; $password_db = ""; $nombre_db = "portal_estadias";
-    $conexion = new mysqli($servidor, $usuario_db, $password_db, $nombre_db);
-    if ($conexion->connect_error) { throw new Exception("Error de conexión a la BD: " . $conexion->connect_error); }
-
-    if (!isset($_SESSION['matricula'])) { throw new Exception("Acceso no autorizado."); }
-
-    // --- FUNCIÓN PARA GESTIONAR CARPETAS ---
-    function buscarOCrearCarpeta($service, $nombreCarpeta, $idPadre) {
-        $query = "mimeType='application/vnd.google-apps.folder' and name='" . $nombreCarpeta . "' and '" . $idPadre . "' in parents and trashed=false";
-        $files = $service->files->listFiles(array('q' => $query, 'fields' => 'files(id, name)'));
-        if (count($files->files) == 0) {
-            $fileMetadata = new Google\Service\Drive\DriveFile(array(
-                'name' => $nombreCarpeta, 'mimeType' => 'application/vnd.google-apps.folder', 'parents' => array($idPadre)
-            ));
-            $folder = $service->files->create($fileMetadata, array('fields' => 'id'));
-            return $folder->id;
-        } else { return $files->files[0]->id; }
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES["memoria_archivo"])) {
+    
+    $archivo = $_FILES["memoria_archivo"];
+    
+    // 1. VALIDACIÓN DE 30MB
+    $limite_bytes = 30 * 1024 * 1024; // 30 Megabytes
+    if ($archivo['size'] > $limite_bytes) {
+        echo json_encode(['status' => 'error', 'message' => 'El archivo supera el límite de 30MB permitidos.']);
+        exit;
     }
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // A. OBTENER DATOS
-        $matricula_alumno = $_SESSION['matricula'];
-        $cuatrimestre = $_POST['cuatrimestre'] ?? ''; 
-        $programa_educativo = $_POST['programa_educativo'] ?? ''; 
+    // 2. VALIDACIÓN DE PDF
+    $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+    if ($extension != "pdf") {
+        echo json_encode(['status' => 'error', 'message' => 'Solo se permiten archivos en formato .pdf']);
+        exit;
+    }
 
-        if(empty($cuatrimestre) || empty($programa_educativo)) { throw new Exception("Faltan datos del formulario."); }
+    // 3. RECABAR DATOS PARA EL NOMBRE Y CARPETAS
+    $matricula = $_SESSION['matricula'];
+    // Quitamos espacios del nombre para el PDF
+    $nombre_limpio = str_replace(' ', '', $_SESSION['nombre']); 
+    $programa = $_POST['programa_educativo'];
+    $cuatrimestre = $_POST['cuatrimestre']; 
+    $nivel_carpeta = (strpos(strtolower($cuatrimestre), '6to') !== false) ? "6to" : "11vo";
 
-        if (!isset($_FILES['memoria_archivo']) || $_FILES['memoria_archivo']['error'] != 0) { throw new Exception("No se recibió ningún archivo válido."); }
-        $archivo = $_FILES['memoria_archivo'];
-        $ruta_temporal = $archivo['tmp_name'];
-        
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        if ($finfo->file($ruta_temporal) != "application/pdf") { throw new Exception("El archivo no es un PDF válido."); }
+    // CREAMOS EL NOMBRE PERFECTO
+    $nuevo_nombre_pdf = "{$matricula}_{$nombre_limpio}_{$programa}_{$nivel_carpeta}.pdf";
 
-        // C. RENOMBRAR Y MOVER LOCALMENTE
-        $nivel = (strpos($cuatrimestre, '6to') !== false) ? "TSU" : "ING";
-        $carrera_saneada = preg_replace('/[^A-Za-z0-9]/', '', iconv('UTF-8', 'ASCII//TRANSLIT', $programa_educativo));
-        $nuevo_nombre_archivo = $matricula_alumno . "_ESTADIA_" . $nivel . "_" . $carrera_saneada . ".pdf";
-        
-        $target_dir = "../uploads/temp/";
-        if (!file_exists($target_dir)) { mkdir($target_dir, 0777, true); }
-        $ruta_final = $target_dir . $nuevo_nombre_archivo;
+    // 4. CONFIGURAR GOOGLE DRIVE
+    $client = new Google_Client();
+    $client->setAuthConfig('../client_secret.json');
+    $client->addScope(Google_Service_Drive::DRIVE);
+    
+    // Verificamos que ya tengan el gafete (Paso 2)
+    if (file_exists('token.json')) {
+        $accessToken = json_decode(file_get_contents('token.json'), true);
+        $client->setAccessToken($accessToken);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Falta el token de Google. Ejecuta auth.php primero.']);
+        exit;
+    }
 
-        if (move_uploaded_file($ruta_temporal, $ruta_final)) {
-            $link_google_drive = NULL;
-            // SUBIR A GOOGLE DRIVE
-            $client = new Google\Client();
-            $client->setApplicationName('ProyectoUSB Uploader');
-            $client->setScopes(Google\Service\Drive::DRIVE_FILE);
-            $client->setAuthConfig(__DIR__ . '/../client_secret.json');
-            $client->setAccessType('offline');
-
-            $tokenPath = __DIR__ . '/token.json';
-            if (!file_exists($tokenPath)) { throw new Exception("Falta token.json de Google."); }
-            $accessToken = json_decode(file_get_contents($tokenPath), true);
-            $client->setAccessToken($accessToken);
-            if ($client->isAccessTokenExpired()) {
-                $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
-                file_put_contents($tokenPath, json_encode($client->getAccessToken()));
-            }
-
-            $driveService = new Google\Service\Drive($client);
-            
-            $nombreCarpetaNivel = (strpos($cuatrimestre, '6to') !== false) ? "6to Cuatrimestre" : "11vo Cuatrimestre";
-            $idCarpetaNivel = buscarOCrearCarpeta($driveService, $nombreCarpetaNivel, GOOGLE_DRIVE_ROOT_ID);
-            $idCarpetaCarrera = buscarOCrearCarpeta($driveService, $programa_educativo, $idCarpetaNivel);
-
-            $fileMetadata = new Google\Service\Drive\DriveFile(array(
-                'name' => $nuevo_nombre_archivo, 'parents' => array($idCarpetaCarrera)
-            ));
-            $content = file_get_contents($ruta_final);
-            $gdriveFile = $driveService->files->create($fileMetadata, array(
-                'data' => $content, 'mimeType' => 'application/pdf', 'uploadType' => 'multipart'
-            ));
-
-            $driveService->getClient()->setUseBatch(false);
-            $fileId = $gdriveFile->id;
-            $fileDetails = $driveService->files->get($fileId, array('fields' => 'webViewLink'));
-            $link_google_drive = $fileDetails->getWebViewLink();
-            
-            unlink($ruta_final);
-
-            // E. GUARDAR EN BD
-            $stmt = $conexion->prepare("INSERT INTO entregas (matricula_alumno, nombre_archivo_subido, cuatrimestre_subido, programa_educativo_subido, link_google_drive) VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("issss", $matricula_alumno, $nuevo_nombre_archivo, $cuatrimestre, $programa_educativo, $link_google_drive);
-
-            if ($stmt->execute()) {
-                
-                $url_redireccion = "dashboard.php?status=success&nivel=" . urlencode($nombreCarpetaNivel) . "&carrera=" . urlencode($programa_educativo);
-                
-                echo json_encode([
-                    'status' => 'success',
-                    'message' => 'Archivo subido y guardado correctamente.',
-                    'redirect_url' => $url_redireccion
-                ]);
-                
-            } else {
-                throw new Exception("Error al guardar en la Base de Datos: " . $stmt->error);
-            }
-            $stmt->close();
-        } else {
-            throw new Exception("Error al mover el archivo temporalmente en el servidor.");
+    // Si el token expiró, Google generará uno nuevo automáticamente si está configurado offline
+    if ($client->isAccessTokenExpired()) {
+        if ($client->getRefreshToken()) {
+            $client->fetchAccessTokenWithRefreshToken($client->getRefreshToken());
+            file_put_contents('token.json', json_encode($client->getAccessToken()));
         }
     }
-    $conexion->close();
 
-} catch (Exception $e) {
-    // Si hubo un error en cualquier parte del proceso (Drive, BD, Archivo),
-    // devolvemos un JSON con el error.
-    
-    // http_response_code(500); <-- ¡BORRA O COMENTA ESTA LÍNEA!
-    
-    echo json_encode([
-        'status' => 'error',
-        'message' => $e->getMessage()
-    ]);
-    if (isset($ruta_final) && file_exists($ruta_final)) { unlink($ruta_final); }
-    if (isset($conexion)) { $conexion->close(); }
+    $driveService = new Google_Service_Drive($client);
+
+    // --- LÓGICA DE LA MATRIOSKA (FUNCIÓN BUSCAR O CREAR CARPETA) ---
+    function obtenerCrearCarpeta($driveService, $nombreCarpeta, $idPadre = null) {
+        $q = "mimeType='application/vnd.google-apps.folder' and name='" . $nombreCarpeta . "' and trashed=false";
+        if ($idPadre != null) {
+            $q .= " and '" . $idPadre . "' in parents";
+        }
+        $optParams = ['q' => $q, 'spaces' => 'drive', 'fields' => 'files(id, name)'];
+        $resultados = $driveService->files->listFiles($optParams);
+        
+        if (count($resultados->getFiles()) == 0) {
+            // No existe, la creamos
+            $carpetaMetadata = new Google_Service_Drive_DriveFile([
+                'name' => $nombreCarpeta,
+                'mimeType' => 'application/vnd.google-apps.folder'
+            ]);
+            if ($idPadre != null) {
+                $carpetaMetadata->setParents([$idPadre]);
+            }
+            $carpeta = $driveService->files->create($carpetaMetadata, ['fields' => 'id']);
+            return $carpeta->id;
+        } else {
+            // Ya existe, devolvemos su ID
+            return $resultados->getFiles()[0]->getId();
+        }
+    }
+
+    try {
+        // 5. CONSTRUYENDO LA RUTA EN DRIVE
+        $anio_actual = date('Y');
+        $mes_actual = (int)date('n');
+        
+        // Calcular el periodo basado en el mes actual
+        if ($mes_actual >= 1 && $mes_actual <= 4) {
+            $periodo_actual = "Enero-Abril";
+        } elseif ($mes_actual >= 5 && $mes_actual <= 8) {
+            $periodo_actual = "Mayo-Agosto";
+        } else {
+            $periodo_actual = "Septiembre-Diciembre";
+        }
+
+        // Navegamos creando las carpetas (UTMIR -> 2026 -> Mayo-Agosto -> TIeID -> 6to)
+        $id_utmir = obtenerCrearCarpeta($driveService, 'UTMIR');
+        $id_anio = obtenerCrearCarpeta($driveService, $anio_actual, $id_utmir);
+        $id_periodo = obtenerCrearCarpeta($driveService, $periodo_actual, $id_anio);
+        $id_programa = obtenerCrearCarpeta($driveService, $programa, $id_periodo);
+        $id_nivel = obtenerCrearCarpeta($driveService, $nivel_carpeta, $id_programa);
+
+        // 6. SUBIR EL PDF A LA CARPETA FINAL
+        $fileMetadata = new Google_Service_Drive_DriveFile([
+            'name' => $nuevo_nombre_pdf,
+            'parents' => [$id_nivel]
+        ]);
+        
+        $content = file_get_contents($archivo['tmp_name']);
+        
+        $file = $driveService->files->create($fileMetadata, [
+            'data' => $content,
+            'mimeType' => 'application/pdf',
+            'uploadType' => 'multipart',
+            'fields' => 'id, webViewLink'
+        ]);
+
+        // Damos permiso de lectura para que los administradores lo puedan abrir sin pedir acceso
+        $permission = new Google_Service_Drive_Permission(['type' => 'anyone', 'role' => 'reader']);
+        $driveService->permissions->create($file->id, $permission);
+        
+        $link_drive = $file->webViewLink;
+
+        // 7. GUARDAR EN LA BASE DE DATOS
+        $conexion = new mysqli("localhost", "root", "", "portal_estadias");
+        
+        $stmt = $conexion->prepare("INSERT INTO entregas (matricula_alumno, nombre_archivo_subido, cuatrimestre_subido, programa_educativo_subido, link_google_drive) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("issss", $matricula, $nuevo_nombre_pdf, $cuatrimestre, $programa, $link_drive);
+        $stmt->execute();
+        $stmt->close();
+        $conexion->close();
+
+        // 8. MANDAMOS RESPUESTA DE ÉXITO A JAVASCRIPT
+        echo json_encode(['status' => 'success', 'message' => 'Archivo subido y guardado con éxito.']);
+        
+    } catch (Exception $e) {
+        echo json_encode(['status' => 'error', 'message' => 'Error al subir a Google Drive: ' . $e->getMessage()]);
+    }
+
+} else {
+    echo json_encode(['status' => 'error', 'message' => 'Petición inválida.']);
 }
 ?>

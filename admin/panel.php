@@ -409,6 +409,40 @@ $resultado = $conexion->query($sql);
             © <span id="currentYear"></span>. Universidad Tecnológica de Mineral de la Reforma. Todos los derechos reservados.
             </div>
         </footer>
+        <!-- ======================================================== -->
+        <!-- MÓDULO DE HABILITACIÓN MASIVA (.TXT) -->
+        <!-- ======================================================== -->
+        <div style="background: var(--bg-card, #18241e); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 30px; margin-bottom: 30px;">
+            <h3 style="color: #fff; margin-top: 0;">1. Subir lista de aprobados (.txt)</h3>
+            <form id="formCargaTxt">
+                <div style="position: relative; border: 2px dashed #00a86b; padding: 40px 20px; text-align: center; border-radius: 12px; margin-bottom: 15px; cursor: pointer;">
+                    <span id="fileNameDisplay" style="color: #fff; font-weight: bold;">Haz clic o arrastra tu archivo .txt aquí</span>
+                    <input type="file" name="archivo_txt" id="archivo_txt" accept=".txt" required onchange="document.getElementById('fileNameDisplay').innerText = this.files[0].name;" style="opacity: 0; position: absolute; left: 0; top: 0; width: 100%; height: 100%; cursor: pointer;">
+                </div>
+                <button type="submit" style="background: #00a86b; color: #fff; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold;">Leer Matrículas</button>
+            </form>
+        </div>
+
+        <!-- TABLA DE RESULTADOS (Oculta por defecto) -->
+        <div id="panelResultados" style="display: none; background: var(--bg-card, #18241e); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 30px; margin-bottom: 30px;">
+            <h3 style="color: #fff; margin-top: 0;">2. Alumnos Encontrados</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; color: #e2e8f0; font-size: 14px;">
+                <thead>
+                    <tr style="text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <th style="padding: 10px;"><input type="checkbox" id="chkTodos" onchange="seleccionarTodos(this)"></th>
+                        <th style="padding: 10px;">Matrícula</th>
+                        <th style="padding: 10px;">Nombre Completo</th>
+                        <th style="padding: 10px;">Estatus Actual</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpoTabla">
+                    <!-- JS llenará esto -->
+                </tbody>
+            </table>
+            <br>
+            <button style="background: #E74D23; color: #fff; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="habilitarSeleccionados()">Habilitar Alumnos Seleccionados</button>
+        </div>
+        <!-- ======================================================== -->
     </main>
 
     <div class="modal-overlay" id="modalCalendario">
@@ -536,5 +570,84 @@ $resultado = $conexion->query($sql);
             }
         };
     </script>
+    <script>
+    // 1. Enviar el TXT a PHP y mostrar la tabla
+    document.getElementById('formCargaTxt').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+
+        // Ruta hacia tu API
+        fetch('../api/procesar_txt.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(respuesta => {
+            if(respuesta.status === 'success') {
+                const tbody = document.getElementById('cuerpoTabla');
+                tbody.innerHTML = ''; 
+                
+                if(respuesta.data.length === 0){
+                    alert("No se encontró ninguna de esas matrículas en la base de datos.");
+                    return;
+                }
+
+                respuesta.data.forEach(alumno => {
+                    const yaAcreditado = (alumno.acreditado == 1);
+                    const badge = yaAcreditado ? '<span style="color: #00a86b; font-weight: bold;">Activo</span>' : '<span style="color: #ef4444; font-weight: bold;">Bloqueado</span>';
+                    const checkbox = yaAcreditado ? `<input type="checkbox" disabled checked title="Ya está habilitado">` : `<input type="checkbox" class="chk-alumno" value="${alumno.matricula}">`;
+
+                    tbody.innerHTML += `
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 10px;">${checkbox}</td>
+                            <td style="padding: 10px;"><b>${alumno.matricula}</b></td>
+                            <td style="padding: 10px;">${alumno.nombre_completo}</td>
+                            <td style="padding: 10px;">${badge}</td>
+                        </tr>
+                    `;
+                });
+
+                document.getElementById('panelResultados').style.display = 'block';
+                alert(`Lectura Exitosa. Se encontraron ${respuesta.data.length} alumnos válidos.`);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    // Función para el Checkbox Maestro
+    function seleccionarTodos(source) {
+        const checkboxes = document.querySelectorAll('.chk-alumno');
+        checkboxes.forEach(chk => chk.checked = source.checked);
+    }
+
+    // 2. Mandar la orden de habilitar a la Base de Datos
+    function habilitarSeleccionados() {
+        const seleccionados = [];
+        document.querySelectorAll('.chk-alumno:checked').forEach(chk => seleccionados.push(chk.value));
+
+        if (seleccionados.length === 0) {
+            alert("Debe seleccionar al menos un alumno para habilitar.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('matriculas_habilitar', JSON.stringify(seleccionados));
+
+        fetch('../api/procesar_txt.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(respuesta => {
+            if(respuesta.status === 'success') {
+                alert("¡Proceso Completado! " + respuesta.message);
+                // Escondemos la tabla y limpiamos el input
+                document.getElementById('panelResultados').style.display = 'none';
+                document.getElementById('formCargaTxt').reset();
+                document.getElementById('fileNameDisplay').innerText = "Haz clic o arrastre tu archivo .txt aquí";
+            }
+        });
+    }
+</script>
 </body>
 </html>

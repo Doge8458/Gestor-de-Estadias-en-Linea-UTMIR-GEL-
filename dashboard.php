@@ -15,7 +15,26 @@ while ($fila = $resultado->fetch_assoc()) {
     if (strpos($fila['cuatrimestre_subido'], '6to') !== false) { $entrega_tsu = $fila; }
     if (strpos($fila['cuatrimestre_subido'], '11vo') !== false) { $entrega_ing = $fila; }
 }
-$stmt->close(); 
+$stmt->close();
+
+// NUEVO CODIGO: Verificar si el alumno ya esta acredita para la subida de archivos.
+$acreditado = 0;
+$stmt_acred = $conexion->prepare("SELECT acreditado FROM alumnos WHERE matricula = ?");
+$stmt_acred->bind_param("i", $matricula_alumno); // <-- Aquí estaba el detalle
+$stmt_acred->execute();
+$stmt_acred->bind_result($acreditado);
+$stmt_acred->fetch();
+$stmt_acred->close();
+
+// NUEVO CODIGO: Verificar si el alumno ya esta acreditado y si ya vio el video
+$acreditado = 0;
+$video_visto = 0;
+$stmt_acred = $conexion->prepare("SELECT acreditado, video_visto FROM alumnos WHERE matricula = ?");
+$stmt_acred->bind_param("i", $matricula_alumno); 
+$stmt_acred->execute();
+$stmt_acred->bind_result($acreditado, $video_visto);
+$stmt_acred->fetch();
+$stmt_acred->close();
 
 // 2. OBTENCIÓN DEL PERIODO CONFIGURADO
 $res_periodo = $conexion->query("SELECT * FROM configuracion_periodo LIMIT 1");
@@ -388,6 +407,12 @@ $haTerminadoTodo = ($yaSubioTSU && $yaSubioING);
                 <h3 style="color: var(--blanco); font-size:22px; margin: 15px 0 10px 0;">Expediente Institucional Completo</h3>
                 <p style="color: var(--texto-claro); margin:0;">El departamento de Vinculación ha recibido exitosamente ambos documentos. Ya no hay acciones pendientes.</p>
             </div>
+        <?php elseif ($acreditado == 0): ?>
+            <div style="background: var(--bg-card); border: 1px solid var(--utmir-naranja); border-radius: 16px; padding: 40px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="var(--utmir-naranja)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <h3 style="color: var(--blanco); font-size:22px; margin: 15px 0 10px 0;">Acceso Restringido</h3>
+                <p style="color: var(--texto-claro); margin:0;">Aún no estás acreditado para subir tu memoria. Tu proceso está en revisión administrativa. Por favor, espera indicaciones.</p>
+            </div>
         <?php else: ?>
             <div class="content-grid">
                 
@@ -653,5 +678,69 @@ $haTerminadoTodo = ($yaSubioTSU && $yaSubioING);
         });
         <?php endif; ?>
     </script>
+
+    <!-- MODAL DEL VIDEO OBLIGATORIO -->
+    <div class="modal-overlay <?php echo ($video_visto == 0) ? 'active' : ''; ?>" id="videoModal" style="z-index: 2000; background: rgba(0,0,0,0.95);">
+        <div class="modal-box" style="max-width: 650px; width: 95%;">
+            <h3 style="color: var(--utmir-verde); font-size: 24px; margin-top:0;">Bienvenido al Portal GEL</h3>
+            <p style="color: var(--texto-claro); font-size: 14px;">Por favor, mira el siguiente tutorial completo para aprender a subir tu memoria de estadía. <b style="color: var(--utmir-naranja);">No podrás cerrar esta ventana hasta que el video termine.</b></p>
+            
+            <!-- Contenedor donde la API de YouTube inyectará el video -->
+            <div id="youtubePlayer" style="border-radius: 12px; overflow: hidden; border: 2px solid var(--borde-sutil);"></div>
+            
+            <button id="btnCerrarVideo" class="btn-submit" style="display: <?php echo ($video_visto == 1) ? 'block' : 'none'; ?>; width: 100%; margin-top: 20px;" onclick="document.getElementById('videoModal').classList.remove('active')">Entendido, ir al panel</button>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE LA API DE YOUTUBE -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        var player;
+        var estadoVideoVisto = <?php echo $video_visto; ?>;
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtubePlayer', {
+                height: '360',
+                width: '100%',
+                // AQUÍ ESTÁ EL ID DE TU VIDEO OFICIAL
+                videoId: 'azKiV4fMksY', 
+                playerVars: {
+                    'controls': 0, // Oculta la barra de tiempo
+                    'disablekb': 1, // Desactiva el teclado
+                    'rel': 0, // Evita videos recomendados al final
+                    'modestbranding': 1 // Oculta el logo gigante de YouTube
+                },
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            // Si el video termina (Estado 0) y el alumno no lo había visto
+            if (event.data == YT.PlayerState.ENDED && estadoVideoVisto == 0) {
+                
+                // 1. Mostramos el botón para cerrar
+                document.getElementById('btnCerrarVideo').style.display = 'block';
+                
+                // 2. Le avisamos a la Base de Datos de FORMA SEGURA (Por POST)
+                fetch('api/marcar_video.php', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    console.log("Respuesta del servidor:", data); // Para monitorear en la consola
+                })
+                .catch(error => console.error("Error al guardar el estado del video:", error));
+
+                // 3. Actualizamos la variable local
+                estadoVideoVisto = 1; 
+            }
+        }
+
+        // Función por si quieres poner un botón en el menú lateral que diga "Ver Tutorial"
+        function abrirVideoTutorial() {
+            document.getElementById('videoModal').classList.add('active');
+        }
+    </script>
+
 </body>
 </html>
