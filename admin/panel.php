@@ -102,14 +102,14 @@ $resultado = $conexion->query($sql);
                     Programador de Periodo</h3>
                     <p>Establece el rango de fechas en el que la plataforma permitirá la recepción de memorias. El sistema bloqueará las entregas automáticamente al concluir este tiempo.</p>
                 </div>
-                <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                <div class="periodo-actions">
                     <div class="countdown-box">
                         <div class="cd-item"><span class="cd-number" id="cd-dias">00</span><span class="cd-label">Días</span></div>
                         <div class="cd-item"><span class="cd-number" id="cd-horas">00</span><span class="cd-label">Horas</span></div>
                         <div class="cd-item"><span class="cd-number" id="cd-mins">00</span><span class="cd-label">Mins</span></div>
                         <div class="cd-item"><span class="cd-number" id="cd-segs">00</span><span class="cd-label">Segs</span></div>
                     </div>
-                    <button class="btn-action-small btn-action-orange" onclick="abrirModalCalendario()" style="padding: 12px 24px; font-size: 13px;">Modificar Fechas</button>
+                    <button class="btn-action-small btn-action-orange periodo-btn" onclick="abrirModalCalendario()">Modificar Fechas</button>
                 </div>
             </div>
             
@@ -123,7 +123,7 @@ $resultado = $conexion->query($sql);
                 <input type="text" name="q" class="search-input" placeholder="Buscar por Matrícula o Nombre del Alumno..." value="<?php echo htmlspecialchars($busqueda); ?>">
                 <button type="submit" class="btn-search">Buscar</button>
                 <?php if(!empty($busqueda)): ?>
-                    <a href="panel.php" class="btn-search" style="background: var(--bg-input); color: var(--blanco); border: 1px solid var(--borde-sutil); text-decoration: none; display: flex; align-items: center;">Limpiar</a>
+                    <a href="panel.php" class="btn-search btn-search-clear">Limpiar</a>
                 <?php endif; ?>
             </form>
         </div>
@@ -239,27 +239,27 @@ $resultado = $conexion->query($sql);
         <!-- ======================================================== -->
         <!-- MÓDULO DE HABILITACIÓN MASIVA (.TXT) -->
         <!-- ======================================================== -->
-        <div style="background: var(--bg-card, #18241e); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 30px; margin-bottom: 30px;">
-            <h3 style="color: #fff; margin-top: 0;">1. Subir lista de aprobados (.txt)</h3>
+        <div class="txt-module-card">
+            <h3 class="txt-module-title">1. Subir lista de aprobados (.txt)</h3>
             <form id="formCargaTxt">
-                <div style="position: relative; border: 2px dashed #00a86b; padding: 40px 20px; text-align: center; border-radius: 12px; margin-bottom: 15px; cursor: pointer;">
-                    <span id="fileNameDisplay" style="color: #fff; font-weight: bold;">Haz clic o arrastra tu archivo .txt aquí</span>
-                    <input type="file" name="archivo_txt" id="archivo_txt" accept=".txt" required onchange="document.getElementById('fileNameDisplay').innerText = this.files[0].name;" style="opacity: 0; position: absolute; left: 0; top: 0; width: 100%; height: 100%; cursor: pointer;">
+                <div class="txt-dropzone">
+                    <span id="fileNameDisplay" class="txt-file-name">Haz clic o arrastra tu archivo .txt aquí</span>
+                    <input type="file" name="archivo_txt" id="archivo_txt" accept=".txt" required onchange="document.getElementById('fileNameDisplay').innerText = this.files[0].name;" class="txt-file-input">
                 </div>
-                <button type="submit" style="background: #00a86b; color: #fff; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold;">Leer Matrículas</button>
+                <button type="submit" class="txt-btn-submit">Leer Matrículas</button>
             </form>
         </div>
 
         <!-- TABLA DE RESULTADOS (Oculta por defecto) -->
-        <div id="panelResultados" style="display: none; background: var(--bg-card, #18241e); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 30px; margin-bottom: 30px;">
-            <h3 style="color: #fff; margin-top: 0;">2. Alumnos Encontrados</h3>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; color: #e2e8f0; font-size: 14px;">
+        <div id="panelResultados" class="txt-results-panel">
+            <h3 class="txt-module-title">2. Alumnos Encontrados</h3>
+            <table class="txt-results-table">
                 <thead>
-                    <tr style="text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                        <th style="padding: 10px;"><input type="checkbox" id="chkTodos" onchange="seleccionarTodos(this)"></th>
-                        <th style="padding: 10px;">Matrícula</th>
-                        <th style="padding: 10px;">Nombre Completo</th>
-                        <th style="padding: 10px;">Estatus Actual</th>
+                    <tr class="txt-results-header">
+                        <th class="txt-cell"><input type="checkbox" id="chkTodos" onchange="seleccionarTodos(this)"></th>
+                        <th class="txt-cell">Matrícula</th>
+                        <th class="txt-cell">Nombre Completo</th>
+                        <th class="txt-cell">Estatus Actual</th>
                     </tr>
                 </thead>
                 <tbody id="cuerpoTabla">
@@ -267,18 +267,18 @@ $resultado = $conexion->query($sql);
                 </tbody>
             </table>
             <br>
-            <button style="background: #E74D23; color: #fff; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold;" onclick="habilitarSeleccionados()">Habilitar Alumnos Seleccionados</button>
+            <button class="txt-btn-enable" onclick="habilitarSeleccionados()">Habilitar Alumnos Seleccionados</button>
         </div>
         <!-- ======================================================== -->
     </main>
 
     <div class="modal-overlay" id="modalCalendario">
-        <div class="modal-box" style="max-width: 600px;">
-            <h3 class="modal-title" style="color: var(--utmir-verde);">Programar Periodo de Recepción</h3>
+        <div class="modal-box modal-box-wide">
+            <h3 class="modal-title modal-title-green">Programar Periodo de Recepción</h3>
             <p class="modal-text">Selecciona los días hábiles en los que los alumnos podrán subir sus memorias a la plataforma. Fuera de esta fecha, el sistema se bloqueará.</p>
             
             <form action="" method="POST">
-                <input type="text" name="rango_fechas" id="rango_fechas" placeholder="Selecciona Inicio y Fin..." style="width: 100%; padding: 15px; border-radius: 8px; border: 1px solid var(--borde-sutil); background: var(--bg-input); color: var(--blanco); margin-bottom: 25px; text-align: center; font-size: 15px;" required readonly>
+                <input type="text" name="rango_fechas" id="rango_fechas" placeholder="Selecciona Inicio y Fin..." class="date-range-input" required readonly>
                 
                 <div class="modal-actions">
                     <button type="button" class="btn-cancel" onclick="cerrarModal('modalCalendario')">Cancelar</button>
