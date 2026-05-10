@@ -29,6 +29,9 @@
         function cerrarModal(idModal) { document.getElementById(idModal).classList.remove('active'); if (idModal === 'modalConfirmacion') idEliminarGlobal = null; }
         function ejecutarEliminacion() { if(idEliminarGlobal !== null) window.location.href = "../api/delete_entrega.php?id=" + idEliminarGlobal; }
 
+
+        document.getElementById('btnAbrirModalCalendario')?.addEventListener('click', abrirModalCalendario);
+
         window.onload = function() {
             document.getElementById('currentYear').textContent = new Date().getFullYear();
             
