@@ -252,6 +252,162 @@ footer .lema.naranja {
     color: var(--utmir-naranja); /* Color cuando el formulario de Login está activo */
 }
 
+.login-title {
+    color: #333;
+    margin-top: 10px;
+}
+
+.hidden-input {
+    display: none;
+}
+
+.is-hidden {
+    display: none !important;
+}
+
+.lock-icon {
+    margin-bottom: 20px;
+}
+
+/* Pantalla de Bloqueo de Periodo */
+#pantalla-bloqueo {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--gris-fondo);
+    z-index: 9999;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
+.bloqueo-card {
+    background: var(--blanco);
+    padding: 50px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    max-width: 600px;
+    border-top: 5px solid var(--utmir-guinda);
+}
+
+.bloqueo-card h1 {
+    color: var(--utmir-guinda);
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.bloqueo-card p {
+    color: var(--gris-texto);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* Botón superior de aviso y modal para alumno */
+.btn-aviso-periodo {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--blanco);
+    color: var(--utmir-verde);
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    cursor: pointer;
+    z-index: 900;
+    border: 1px solid var(--utmir-verde);
+    transition: 0.3s;
+}
+
+.btn-aviso-periodo:hover {
+    background: var(--utmir-verde);
+    color: var(--blanco);
+}
+
+.modal-alumno {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-alumno.active {
+    display: flex;
+}
+
+.modal-card {
+    background: var(--blanco);
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 650px;
+}
+
+.modal-card h2 {
+    color: var(--utmir-verde);
+    margin-bottom: 20px;
+}
+
+.modal-card-intro {
+    margin-top: 0;
+    font-size: 13px;
+}
+
+.modal-action-full {
+    width: 100%;
+    margin-top: 30px;
+}
+
+.cd-box {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.cd-item-al {
+    background: var(--gris-fondo);
+    padding: 15px;
+    border-radius: 8px;
+    width: 70px;
+    border: 1px solid rgba(0, 107, 63, 0.2);
+}
+
+.cd-item-al span {
+    display: block;
+}
+
+.cd-item-al .num {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--utmir-verde);
+}
+
+.cd-item-al .lab {
+    font-size: 10px;
+    color: var(--gris-texto);
+    text-transform: uppercase;
+    margin-top: 5px;
+}
+
+.flatpickr-calendar {
+    margin: 0 auto;
+    box-shadow: none !important;
+    border: 1px solid #eee;
+}
+
 /* apartado plataforma administrativa, el lema del footer cambia a naranja cuando el
 formulario de login está activo. Para esto, se agrega la clase "naranja" al elemento del lema en el footer cuando el formulario de login está activo, y se define un estilo 
 para esa clase que cambia el color del texto a naranja. La transición suave se logra con 

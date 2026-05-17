@@ -1,5 +1,16 @@
 var player;
-var estadoVideoVisto = (window.dashboardData && window.dashboardData.videoVisto) ? 1 : 0;
+const dashboardVideoDataElement = document.getElementById('dashboard-data');
+const dashboardVideoData = dashboardVideoDataElement ? JSON.parse(dashboardVideoDataElement.textContent) : {};
+var estadoVideoVisto = dashboardVideoData.videoVisto ? 1 : 0;
+
+document.addEventListener('DOMContentLoaded', function () {
+    const btnCerrarVideo = document.getElementById('btnCerrarVideo');
+    const videoModal = document.getElementById('videoModal');
+
+    if (btnCerrarVideo && videoModal) {
+        btnCerrarVideo.addEventListener('click', () => videoModal.classList.remove('active'));
+    }
+});
 
 function onYouTubeIframeAPIReady() {
     player = new YT.Player('youtubePlayer', {
@@ -20,7 +31,7 @@ function onYouTubeIframeAPIReady() {
 
 function onPlayerStateChange(event) {
     if (event.data == YT.PlayerState.ENDED && estadoVideoVisto == 0) {
-        document.getElementById('btnCerrarVideo').style.display = 'block';
+        document.getElementById('btnCerrarVideo').classList.remove('is-hidden');
 
         fetch('api/marcar_video.php', { method: 'POST' })
             .then(res => res.json())

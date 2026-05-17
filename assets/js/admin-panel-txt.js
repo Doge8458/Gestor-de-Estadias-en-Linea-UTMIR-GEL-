@@ -1,3 +1,22 @@
+    const archivoTxt = document.getElementById('archivo_txt');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const chkTodos = document.getElementById('chkTodos');
+    const btnHabilitarSeleccionados = document.getElementById('btnHabilitarSeleccionados');
+
+    if (archivoTxt && fileNameDisplay) {
+        archivoTxt.addEventListener('change', function () {
+            fileNameDisplay.innerText = this.files[0] ? this.files[0].name : 'Haz clic o arrastra tu archivo .txt aquí';
+        });
+    }
+
+    if (chkTodos) {
+        chkTodos.addEventListener('change', () => seleccionarTodos(chkTodos));
+    }
+
+    if (btnHabilitarSeleccionados) {
+        btnHabilitarSeleccionados.addEventListener('click', habilitarSeleccionados);
+    }
+
     // 1. Enviar el TXT a PHP y mostrar la tabla
     document.getElementById('formCargaTxt').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -21,15 +40,15 @@
 
                 respuesta.data.forEach(alumno => {
                     const yaAcreditado = (alumno.acreditado == 1);
-                    const badge = yaAcreditado ? '<span style="color: #00a86b; font-weight: bold;">Activo</span>' : '<span style="color: #ef4444; font-weight: bold;">Bloqueado</span>';
+                    const badge = yaAcreditado ? '<span class="txt-status-active">Activo</span>' : '<span class="txt-status-blocked">Bloqueado</span>';
                     const checkbox = yaAcreditado ? `<input type="checkbox" disabled checked title="Ya está habilitado">` : `<input type="checkbox" class="chk-alumno" value="${alumno.matricula}">`;
 
                     tbody.innerHTML += `
-                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                            <td style="padding: 10px;">${checkbox}</td>
-                            <td style="padding: 10px;"><b>${alumno.matricula}</b></td>
-                            <td style="padding: 10px;">${alumno.nombre_completo}</td>
-                            <td style="padding: 10px;">${badge}</td>
+                        <tr class="txt-result-row">
+                            <td class="txt-cell">${checkbox}</td>
+                            <td class="txt-cell"><b>${alumno.matricula}</b></td>
+                            <td class="txt-cell">${alumno.nombre_completo}</td>
+                            <td class="txt-cell">${badge}</td>
                         </tr>
                     `;
                 });

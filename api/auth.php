@@ -21,7 +21,8 @@ if (!isset($_GET['code'])) {
     // Guardamos el token para que upload.php lo use en el futuro
     file_put_contents('token.json', json_encode($token));
     
-    echo "<h2 style='color:green;'>¡ÉXITO! Gafete VIP (token.json) generado.</h2>";
+    echo "<link rel='stylesheet' href='../assets/css/auth.css'>";
+    echo "<h2 class='auth-success'>¡ÉXITO! Gafete VIP (token.json) generado.</h2>";
     echo "<p>Tu plataforma ya tiene permiso para subir archivos a Drive. Ya puedes cerrar esta ventana.</p>";
 }
 ?> 

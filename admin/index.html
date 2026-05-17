@@ -14,10 +14,10 @@
         
         <div class="form-container sign-up-container">
             <form action="../admin/login_auth.php" method="POST">
-                <div class="gel-logo" style="color: var(--utmir-verde);">GEL</div>
-                <div class="gel-subtitle" style="color: var(--utmir-verde);">PANEL DE CONTROL</div>
+                <div class="gel-logo">GEL</div>
+                <div class="gel-subtitle">PANEL DE CONTROL</div>
                 
-                <h2 style="color: #333; margin-top:10px;">Bienvenido Administrador</h2>
+                <h2 class="login-title">Bienvenido Administrador</h2>
                 <span>Ingresa tus credenciales administrativas para continuar.</span>
                 
                 <input type="text" name="user" placeholder="Usuario (Ej. admin)" required />
@@ -58,29 +58,7 @@
         © <span id="currentYear"></span>. Universidad Tecnológica de Mineral de la Reforma. Todos los derechos reservados.
     </footer>
 
-    <script>
-        const signUpButton = document.getElementById('signUp');
-        const signInButton = document.getElementById('signIn');
-        const container = document.getElementById('container');
-        const lemaFooter = document.querySelector('.lema');
-
-        // Al hacer clic en "Iniciar Sesión"
-        signUpButton.addEventListener('click', () => {
-            container.classList.add('right-panel-active');
-            // Se actualiza la clase a naranja
-            lemaFooter.classList.add('naranja');
-        });
-
-        // Al hacer clic en "Regresar"
-        signInButton.addEventListener('click', () => {
-            container.classList.remove('right-panel-active');
-            // Se actualiza la clase a naranja
-            lemaFooter.classList.remove('naranja');
-        });
-
-        // Obtener el año dinámicamente
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
-    </script>
+    <script src="../assets/js/admin-login.js"></script>
 
 </body>
 </html>

@@ -1,5 +1,7 @@
 const toggleSwitches = document.querySelectorAll('.theme-checkbox');
 const currentTheme = localStorage.getItem('theme');
+const dashboardDataElement = document.getElementById('dashboard-data');
+const dashboardData = dashboardDataElement ? JSON.parse(dashboardDataElement.textContent) : {};
 
 if (currentTheme) {
     document.documentElement.setAttribute('data-theme', currentTheme);
@@ -29,7 +31,7 @@ function actualizarNombreArchivo(input) {
     const icon = document.getElementById('uploadIcon');
 
     if (input.files && input.files[0]) {
-        display.innerHTML = `<span style="color: var(--utmir-verde); font-size: 16px;">${input.files[0].name}</span>`;
+        display.innerHTML = `<span class="selected-file-name">${input.files[0].name}</span>`;
         dropArea.style.borderColor = 'var(--utmir-verde)';
         icon.innerHTML = `<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><polyline points="9 15 12 18 15 15"></polyline><line x1="12" y1="18" x2="12" y2="12"></line>`;
         icon.style.stroke = 'var(--utmir-verde)';
@@ -41,10 +43,10 @@ function actualizarNombreArchivo(input) {
     }
 }
 
-window.onload = function () {
+document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-    const data = window.dashboardData || {};
+    const data = dashboardData;
     const fechaFinStr = data.fechaFin || '';
     const fechaInicioStr = data.fechaInicio || '';
 
@@ -95,7 +97,17 @@ window.onload = function () {
     if (data.canUpload) {
         configurarFormularioSubida();
     }
-};
+
+    const fileInput = document.getElementById('archivo_pdf');
+    if (fileInput) {
+        fileInput.addEventListener('change', () => actualizarNombreArchivo(fileInput));
+    }
+
+    const btnMessageOk = document.getElementById('btnMessageOk');
+    if (btnMessageOk && typeof cerrarMensajeYRecargar === 'function') {
+        btnMessageOk.addEventListener('click', cerrarMensajeYRecargar);
+    }
+});
 
 function configurarFormularioSubida() {
     const uploadForm = document.getElementById('uploadForm');

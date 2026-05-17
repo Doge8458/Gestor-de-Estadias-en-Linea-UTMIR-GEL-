@@ -1,5 +1,7 @@
         const toggleSwitches = document.querySelectorAll('.theme-checkbox');
         const currentTheme = localStorage.getItem('theme');
+        const adminPanelDataElement = document.getElementById('admin-panel-data');
+        const adminPanelData = adminPanelDataElement ? JSON.parse(adminPanelDataElement.textContent) : {};
         if (currentTheme) {
             document.documentElement.setAttribute('data-theme', currentTheme);
             if (currentTheme === 'light') toggleSwitches.forEach(sw => sw.checked = true);
@@ -29,6 +31,25 @@
         function cerrarModal(idModal) { document.getElementById(idModal).classList.remove('active'); if (idModal === 'modalConfirmacion') idEliminarGlobal = null; }
         function ejecutarEliminacion() { if(idEliminarGlobal !== null) window.location.href = "../api/delete_entrega.php?id=" + idEliminarGlobal; }
 
+
+        document.getElementById('btnAbrirModalCalendario')?.addEventListener('click', abrirModalCalendario);
+        document.querySelectorAll('[data-modal-close]').forEach(button => {
+            button.addEventListener('click', () => cerrarModal(button.dataset.modalClose));
+        });
+        document.getElementById('btnConfirmarEliminacion')?.addEventListener('click', ejecutarEliminacion);
+        document.querySelectorAll('.main-row[data-detail-target]').forEach(row => {
+            row.addEventListener('click', () => toggleDetails(row.dataset.detailTarget, row));
+        });
+        document.querySelectorAll('.detail-action').forEach(action => {
+            action.addEventListener('click', event => event.stopPropagation());
+        });
+        document.querySelectorAll('.btn-delete-entrega').forEach(button => {
+            button.addEventListener('click', event => {
+                event.stopPropagation();
+                abrirModalDelete(button.dataset.idEntrega, button.dataset.matricula);
+            });
+        });
+
         window.onload = function() {
             document.getElementById('currentYear').textContent = new Date().getFullYear();
             
@@ -42,7 +63,7 @@
             });
 
             // Lógica del Contador y Calendario Visual Administrativo
-            const data = window.adminPanelData || {};
+            const data = adminPanelData;
             const fechaFinStr = data.fechaFin || "";
             const fechaInicioStr = data.fechaInicio || "";
             

@@ -183,6 +183,32 @@
         .btn-ok { background: var(--utmir-verde); color: #fff; border: none; padding: 14px; border-radius: 8px; font-weight: 800; width: 100%; margin-top: 20px; cursor: pointer; transition: 0.3s; text-transform: uppercase;}
         .btn-ok:hover { filter: brightness(1.2); }
 
+        .text-on-dark { color: var(--blanco); }
+        .hidden-input { display: none; }
+        .status-meta { color: var(--texto-mutado); font-size: 12px; }
+        .state-card { background: var(--bg-card); border-radius: 16px; padding: 40px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .state-card--warning { border: 1px solid var(--utmir-naranja); }
+        .state-card--success { border: 1px solid rgba(0, 168, 107, 0.4); }
+        .state-card-title { color: var(--blanco); font-size: 22px; margin: 15px 0 10px 0; }
+        .state-card-text { color: var(--texto-claro); margin: 0; }
+        .example-text { font-size: 12px; color: var(--texto-mutado); margin-top: 5px; display: block; }
+        .modal-icon-spaced { margin-bottom: 15px; }
+        .modal-title-loading { color: var(--blanco); font-size: 20px; margin-top: 0; }
+        .modal-text-muted { color: var(--texto-mutado); font-size: 14px; margin: 0; }
+        .progress-text { color: var(--utmir-verde); font-weight: bold; font-size: 16px; margin-top: 10px; }
+        .message-icon-container { margin-bottom: 20px; }
+        .message-title { font-size: 22px; margin-top: 0; color: var(--blanco); }
+        .message-text { color: var(--texto-claro); font-size: 14px; line-height: 1.5; }
+        .video-modal { z-index: 2000; background: rgba(0,0,0,0.95); }
+        .video-modal-box { max-width: 650px; width: 95%; }
+        .video-title { color: var(--utmir-verde); font-size: 24px; margin-top: 0; }
+        .video-text { color: var(--texto-claro); font-size: 14px; }
+        .video-warning { color: var(--utmir-naranja); }
+        .youtube-player { border-radius: 12px; overflow: hidden; border: 2px solid var(--borde-sutil); }
+        .video-close-btn { width: 100%; margin-top: 20px; }
+        .is-hidden { display: none !important; }
+        .selected-file-name { color: var(--utmir-verde); font-size: 16px; }
+
         @media (max-width: 1000px) { 
             body { flex-direction: column; }
             .sidebar { width: 100%; height: auto; position: relative; flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center; padding: 15px 20px; border-right: none; border-bottom: 1px solid var(--borde-sutil); background: #0a0f0c;}

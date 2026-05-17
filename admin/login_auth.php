@@ -8,6 +8,7 @@ if ($user === "admin" && $pass === "utmir2025") {
     $_SESSION['admin_logged'] = true;
     header("Location: panel.php");
 } else {
-    echo "<script>alert('Datos incorrectos'); window.location.href='index.html';</script>";
+    header("Location: index.html?error=datos");
+    exit();
 }
 ?>

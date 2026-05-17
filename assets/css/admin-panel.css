@@ -192,3 +192,18 @@
 .modal-box-wide { max-width: 600px; }
 .modal-title-green { color: var(--utmir-verde); }
 .date-range-input { width: 100%; padding: 15px; border-radius: 8px; border: 1px solid var(--borde-sutil); background: var(--bg-input); color: var(--blanco); margin-bottom: 25px; text-align: center; font-size: 15px; }
+
+.hidden-input { display: none; }
+.student-name-cell { font-weight: 600; color: var(--blanco); }
+.muted-cell { color: var(--texto-mutado); }
+.pending-text { color: var(--peligro); font-weight: 500; }
+.pending-detail { flex: 2; text-align: center; }
+.pending-icon { margin-bottom: 10px; opacity: 0.7; }
+.pending-title { color: var(--peligro); font-size: 14px; }
+.pending-description { margin: 0; color: var(--texto-mutado); }
+.empty-text { color: var(--texto-mutado); font-size: 14px; }
+.txt-enable-toolbar { margin-top: 20px; }
+.modal-highlight { color: var(--blanco); }
+.txt-status-active { color: #00a86b; font-weight: bold; }
+.txt-status-blocked { color: #ef4444; font-weight: bold; }
+.txt-result-row { border-bottom: 1px solid rgba(255,255,255,0.05); }
